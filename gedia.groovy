@@ -5,9 +5,10 @@
 import static ratpack.groovy.Groovy.ratpack
 
 ratpack {
+  ratpack.server.BaseDir.find()
   handlers {
     get {
-      render "Hello World"
+      render(file("message.txt"))
     }
   }
 }
