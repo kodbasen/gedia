@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: gedia
+  name: gedia
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: gedia
+  template:
+    metadata:
+      labels:
+        run: gedia
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: -server -Xmx256m -Xms256m
+        image: kodbasen/gedia-arm:latest
+        imagePullPolicy: Always
+        name: gedia
+        livenessProbe:
+          httpGet:
+            path: /
+            port: web
+          initialDelaySeconds: 120
+          timeoutSeconds: 2
+        ports:
+        - name: web
+          containerPort: 5050
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2
+            memory: 512Mi
+          requests:
+            cpu: 1
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: gedia
+  name: gedia
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5050
+  selector:
+    run: gedia
+  sessionAffinity: None
